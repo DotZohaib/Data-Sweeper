@@ -15,26 +15,35 @@ if 'datasets' not in st.session_state:
 if 'current_file' not in st.session_state:
     st.session_state.current_file = None
 
-# Function to handle different file types
+# Function to handle different file types with encoding fallback
 def load_data(file):
     file_ext = os.path.splitext(file.name)[-1].lower()
     
     try:
         if file_ext == ".csv":
-            return pd.read_csv(file)
+            # Try multiple encodings
+            content = file.getvalue()
+            encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+            
+            for enc in encodings:
+                try:
+                    return pd.read_csv(io.BytesIO(content), encoding=enc)
+                except UnicodeDecodeError:
+                    continue
+                except Exception as e:
+                    st.error(f"Error with {enc}: {str(e)}")
+                    return None
+            st.error("Failed to decode CSV with common encodings")
+            return None
+            
         elif file_ext == ".txt":
-            return pd.read_csv(file, delimiter='\t')  # Adjust delimiter as needed
+            return pd.read_csv(file, delimiter='\t')
         elif file_ext == ".json":
             return pd.read_json(file)
         elif file_ext in [".xlsx", ".xls"]:
             return pd.read_excel(file)
         elif file_ext == ".parquet":
             return pd.read_parquet(file)
-        elif file_ext == ".docx":
-            st.warning("Word (.docx) file support requires python-docx package. Please install it or convert to another format.")
-            with open(file.name, "rb") as f:
-                # Just create a basic DataFrame with file info
-                return pd.DataFrame({'Text': [f"File: {file.name}", "Word files require python-docx package."]})
         else:
             st.error(f"Unsupported file format: {file_ext}")
             return None
