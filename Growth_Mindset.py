@@ -31,13 +31,10 @@ def load_data(file):
         elif file_ext == ".parquet":
             return pd.read_parquet(file)
         elif file_ext == ".docx":
-            try:
-                doc = Document(file)
-                text = [paragraph.text for paragraph in doc.paragraphs]
-                return pd.DataFrame({'Text': text})
-            except ImportError:
-                st.error("python-docx package is required for .docx files. Install with 'pip install python-docx'")
-                return None
+            st.warning("Word (.docx) file support requires python-docx package. Please install it or convert to another format.")
+            with open(file.name, "rb") as f:
+                # Just create a basic DataFrame with file info
+                return pd.DataFrame({'Text': [f"File: {file.name}", "Word files require python-docx package."]})
         else:
             st.error(f"Unsupported file format: {file_ext}")
             return None
@@ -46,7 +43,7 @@ def load_data(file):
         return None
 
 # File uploader
-uploaded_files = st.file_uploader("Upload files", type=["csv", "txt", "json", "xlsx", "xls", "docx", "parquet"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload files", type=["csv", "txt", "json", "xlsx", "xls", "parquet"], accept_multiple_files=True)
 
 # Process uploaded files
 for file in uploaded_files:
@@ -280,7 +277,6 @@ with st.expander("App Documentation"):
     ### Supported File Types
     - CSV, TXT (tab-delimited), JSON
     - Excel (XLSX, XLS)
-    - Word DOCX (text extraction)
     - Parquet
     
     ### Data Cleaning Options
