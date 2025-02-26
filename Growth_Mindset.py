@@ -3,9 +3,6 @@ import pandas as pd
 import numpy as np
 import io
 import os
-# from docx import Document
-# import matplotlib.pyplot as plt
-# import seaborn as sns
 
 # Set page configuration
 st.set_page_config(page_title="Data Sweeper", layout="wide")
@@ -171,11 +168,9 @@ if st.session_state.datasets:
         if len(categorical_cols) >= 1:
             selected_cat = st.selectbox("Select categorical column for pie chart", [""] + list(categorical_cols))
             if selected_cat and st.button("Generate Pie Chart"):
-                fig, ax = plt.subplots()
                 value_counts = df[selected_cat].value_counts().head(10)  # Top 10 categories
-                ax.pie(value_counts, labels=value_counts.index, autopct='%1.1f%%')
-                ax.axis('equal')
-                st.pyplot(fig)
+                st.write(f"Top categories in {selected_cat}:")
+                st.write(value_counts)
         else:
             st.warning("No categorical columns for visualization")
 
@@ -299,7 +294,7 @@ with st.expander("App Documentation"):
     
     ### Visualization
     - Histograms for numeric columns
-    - Pie charts for categorical columns
+    - Summary statistics for categorical columns
     
     ### Conversion Options
     - Convert between CSV, Excel, JSON, TXT, and Parquet
