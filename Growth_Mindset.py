@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import io
 import os
-from docx import Document
-import matplotlib.pyplot as plt
-import seaborn as sns
+# from docx import Document
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 
 # Set page configuration
 st.set_page_config(page_title="Data Sweeper", layout="wide")
